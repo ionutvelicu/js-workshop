@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Orders</title>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/index.css" />
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+</head>
+<body>
+    <header class="main">
+        <h1>Dashboard</h1>
+    </header>
+
+    <div class="wrap">
+        <div id="side">
+            <ul>
+                <li><a class="selected">Orders</a></li>
+            </ul>
+        </div>
+        <div id="content">
+            <div class="content">
+                <div class="row">
+                    <div class="col">
+                        <div class="card">
+                            <div class="card-body">
+                                <form>
+                                    <h4>Search</h4>
+                                    <div class="row">
+                                        <div class="form-group col">
+                                            <label for="searchId">Id</label>
+                                            <input type="text" class="form-control" id="searchId" placeholder="Id">
+                                        </div>
+                                        <div class="form-group col">
+                                            <label for="searchStatus">Status</label>
+                                            <input type="text" class="form-control" id="searchStatus" placeholder="Status">
+                                        </div>
+                                        <div class="form-group col">
+                                            <label for="searchAfter">Placed after</label>
+                                            <input type="text" class="form-control" id="searchAfter" placeholder="Placed after">
+                                        </div>
+                                        <div class="form-group col">
+                                            <label for="createdBy">Created by</label>
+                                            <input type="text" class="form-control" id="createdBy" placeholder="Created by">
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <table class="table" style="margin-top: 2rem">
+                            <thead>
+                                <tr>
+                                    <th scope="col">#ID</th>
+                                    <th scope="col">Created</th>
+                                    <th scope="col">Website</th>
+                                    <th scope="col">Subtotal</th>
+                                    <th scope="col">Total</th>
+                                    <th scope="col">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>1</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/index.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+body {
+    font-family: 'Open Sans', sans-serif;
+}
+
+header.main {
+    background: #553d7b;
+    height: 50px;
+    padding: 0 2rem; }
+    header.main h1 {
+        color: #FFF;
+        font-size: 1.1em;
+        margin: 0;
+        font-weight: 100;
+        font-family: 'Open Sans', sans-serif;
+        text-transform: uppercase;
+        line-height: 50px;
+}
+
+#side {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    bottom: 0;
+    background: #242040;
+    width: 300px;}
+    #side ul {
+        margin: 0;
+        padding: 1rem 0 }
+        #side ul li a {
+            display: block;
+            padding: .5rem 2rem;
+            color: #FFF;
+            font-weight: 300;
+            cursor: pointer; }
+            #side ul li a.selected {
+                background: rgba(255, 255, 255, .1); }
+
+#content {
+    position: absolute;
+    top: 50px;
+    left: 300px;
+    right: 0;
+    bottom: 0;
+    padding: 2rem;
+}
