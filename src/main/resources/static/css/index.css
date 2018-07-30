@@ -5,7 +5,12 @@ body {
 header.main {
     background: #553d7b;
     height: 50px;
-    padding: 0 2rem; }
+    padding: 0 2rem;
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: 0;
+    z-index: 2; }
     header.main h1 {
         color: #FFF;
         font-size: 1.1em;
@@ -22,7 +27,8 @@ header.main {
     left: 0;
     bottom: 0;
     background: #242040;
-    width: 300px;}
+    width: 300px;
+    position: fixed; }
     #side ul {
         margin: 0;
         padding: 1rem 0 }
