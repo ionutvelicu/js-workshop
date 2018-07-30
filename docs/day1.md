@@ -1,4 +1,4 @@
-#### Truthy / Falsy values
+## Truthy / Falsy values
 
 Truthy values are values that is considered true when evaluated to boolean.
 
@@ -15,7 +15,7 @@ var zz = !'A';       // evaluates to false
 var t = !null;       // evaluates to true
 ```
 
-#### Immediately-invoked Function Expression (IIFE)
+## Immediately-invoked Function Expression (IIFE)
 
 A function that is executed immediately after definition in order to define a private scope from which only the necessary function / variables can be exported.
 
@@ -38,7 +38,7 @@ console.log(App.privateVariable);       // prints "undefined"
 
 ```
 
-#### Object creation
+## Object creation
 
 There are two main ways to define object in Javascript:
 
