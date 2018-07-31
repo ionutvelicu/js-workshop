@@ -68,11 +68,12 @@ var Html = (function () {
         var html =
             '<tr>' +
             '<td>' + order.id + '</td>' +
+            '<td><span class="badge badge-pill badge-primary">' + order.status + '</span></td>' +
             '<td>' + order.date + '</td>' +
             '<td>' + order.website + '</td>' +
-            '<td>' + order.subTotal + '</td>' +
-            '<td>' + order.total + '</td>' +
-            '<td><span class="badge badge-pill badge-primary">' + order.status + '</span></td>' +
+            '<td class="subtotal"> &euro;' + order.subTotal + '</td>' +
+            '<td class="total"> &euro;' + order.total + '</td>' +
+            '<td><a class="btn btn-success btn-sm view-order" data-id="' + order.id + '">View</a></td>' +
             '</tr>'
         return html;
     }
@@ -92,7 +93,7 @@ var Service = (function () {
 
     var getOrders = function (page, batch) {
         page = page || 1;
-        batch = batch || 10;
+        batch = batch || 5;
         return $.get(ORDERS_PATH, { page: page, batch: batch});
     }
 
@@ -138,7 +139,7 @@ var App = (function () {
         Html.populatePagination(currentPage, pageCount)
     }
 
-    var onClickLink = function (ev) {
+    var onPageLinkClick = function (ev) {
         ev.stopPropagation()
 
         // this = event.target
@@ -156,6 +157,10 @@ var App = (function () {
             populateOrdersFromResponse(response)
             renderPaginationFromResponse(response)
         })
+    }
+
+    var onViewOrderClick = function (ev) {
+        console.log('=> view order details')
     }
 
     var onInputKeyDown = function (ev) {
@@ -201,10 +206,11 @@ var App = (function () {
     }
 
     var initListeners = function () {
-        $('#pagination').on('click', '.page-link', onClickLink)
-        $(window).on('keyup', onWindowKeyUp)
+        $('#pagination').on('click', '.page-link', onPageLinkClick)
         $('.search-field').on('change', onChangeSearchField)
+        $('#orderList').on('click', '.view-order', onViewOrderClick)
 
+        $(window).on('keyup', onWindowKeyUp)
         $(window).on('keydown', onInputKeyDown)
     }
 
@@ -217,8 +223,6 @@ var App = (function () {
             populateOrdersFromResponse(response)
             renderPaginationFromResponse(response)
         })
-
-
     }
 
     return {

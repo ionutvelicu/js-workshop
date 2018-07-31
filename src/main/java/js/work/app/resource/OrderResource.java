@@ -37,7 +37,7 @@ public class OrderResource {
     @GetMapping(value = "/orders")
     public ResponseEntity<OrderListDto> getOrders(
             @RequestParam(defaultValue = "1") Integer page,
-            @RequestParam(defaultValue = "10") Integer batch
+            @RequestParam(defaultValue = "5") Integer batch
     ) {
         List<Order> orders = db.orders().subList((page - 1) * batch, page * batch);
 

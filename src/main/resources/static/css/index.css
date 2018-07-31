@@ -27,7 +27,7 @@ header.main {
     left: 0;
     bottom: 0;
     background: #242040;
-    width: 300px;
+    width: 240px;
     position: fixed; }
     #side ul {
         margin: 0;
@@ -44,8 +44,21 @@ header.main {
 #content {
     position: absolute;
     top: 50px;
-    left: 300px;
+    left: 240px;
     right: 0;
     bottom: 0;
     padding: 2rem;
+}
+
+.btn-sm {
+    padding: 0 .5rem;
+    color: #FFF !important;
+}
+
+.total {
+    color: #4caf50 !important;
+}
+
+.subtotal {
+    color: #abbb14 !important;;
 }
