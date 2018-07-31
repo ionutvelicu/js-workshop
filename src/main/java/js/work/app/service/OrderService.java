@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderService {
     public boolean matches(SearchBody body, Order order) {
-        if (body.id != null && body.id != order.id) return false;
+        if (body.id != null && !body.id.equals(order.id)) return false;
 
-        if (body.status != null && body.status != order.status) return false;
+        if (body.status != null && !body.status.equals(order.status)) return false;
 
         if (body.createdBy != null) {
             String[] bits = body.createdBy.split(" ");

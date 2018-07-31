@@ -1,3 +1,7 @@
+// equality vs identity
+// set interval / timeout
+
+
 // Domain Module
 // In charge to define all available objects / domain models used in the application
 // The module contains function constructors which can be called with the `new` keyword from other modules
@@ -54,7 +58,7 @@ var Html = (function () {
         var selected = isSelected ? 'active' : '';
         var html =
             '<li class="page-item ' + selected + '">' +
-            '<a class="page-link" href="#">' +
+            '<a class="page-link" data-page="' + (idx + 1) + '">' +
             (idx + 1) +
             '</a></li>';
         return html;
@@ -68,7 +72,7 @@ var Html = (function () {
             '<td>' + order.website + '</td>' +
             '<td>' + order.subTotal + '</td>' +
             '<td>' + order.total + '</td>' +
-            '<td>' + order.status + '</td>' +
+            '<td><span class="badge badge-pill badge-primary">' + order.status + '</span></td>' +
             '</tr>'
         return html;
     }
@@ -89,7 +93,7 @@ var Service = (function () {
     var getOrders = function (page, batch) {
         page = page || 1;
         batch = batch || 10;
-        return $.get(ORDERS_PATH);
+        return $.get(ORDERS_PATH, { page: page, batch: batch});
     }
 
     var getOrderDetails = function(id) {
@@ -102,10 +106,15 @@ var Service = (function () {
         })
     }
 
+    var findOrders = function (body) {
+        return $.get(ORDERS_PATH + '/find', body);
+    }
+
     return {
         getOrders: getOrders,
         getOrderDetails: getOrderDetails,
-        updateOrderStatus: updateOrderStatus
+        updateOrderStatus: updateOrderStatus,
+        findOrders: findOrders
     }
 })()
 
@@ -113,27 +122,109 @@ var Service = (function () {
 // App Module
 // It makes use of all the other modules to handles the app flows and functionality
 var App = (function () {
+    var currentPage = 1
+    var pageCount = 1
+
+    var populateOrdersFromResponse = function (response) {
+        var orders = response.orders.map(function(data){
+            return new Domain.Order(data)
+        })
+        Html.populateTable(orders)
+    }
+
+    var renderPaginationFromResponse = function (response) {
+        currentPage = response.currentPage
+        pageCount = response.pageCount
+        Html.populatePagination(currentPage, pageCount)
+    }
+
+    var onClickLink = function (ev) {
+        ev.stopPropagation()
+
+        // this = event.target
+        var $element = $(this)
+
+        // Set HTML style
+        // Commented out because of renderPaginationFromResponse function
+        // $('#pagination').find('.page-item.active').removeClass('active')
+        // $element.parent().addClass('active')
+
+        // Show page results
+        var page = $element.attr('data-page')
+
+        Service.getOrders(page).done(function (response) {
+            populateOrdersFromResponse(response)
+            renderPaginationFromResponse(response)
+        })
+    }
+
+    var onInputKeyDown = function (ev) {
+        if (ev.target === document.body && ev.which === 9) {
+            ev.preventDefault()
+            currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1
+            Service.getOrders(currentPage).done(function (response) {
+                populateOrdersFromResponse(response)
+                renderPaginationFromResponse(response)
+            })
+        }
+    }
+
+    var onWindowKeyUp = function (ev) {
+        var code = ev.keyCode
+        if (ev.target !== document.body && (code === 37 || code === 39)) return
+
+        if (code === 37 || code === 39) {
+            if (code === 37) {
+                currentPage = (currentPage <= 1) ? 1 : currentPage -1
+            } else if (code === 39) {
+                currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1
+            }
+            Service.getOrders(currentPage).done(function (response) {
+                populateOrdersFromResponse(response)
+                renderPaginationFromResponse(response)
+            })
+        }
+    }
+
+    var onChangeSearchField = function (ev) {
+        var $this = $(this)
+        var type = $this.attr('data-name')
+
+        var body = {}
+        body[type] = $this.val()
+
+        Service.findOrders(body).done(function (response) {
+            populateOrdersFromResponse(response)
+            renderPaginationFromResponse(response)
+        })
+
+    }
+
+    var initListeners = function () {
+        $('#pagination').on('click', '.page-link', onClickLink)
+        $(window).on('keyup', onWindowKeyUp)
+        $('.search-field').on('change', onChangeSearchField)
+
+        $(window).on('keydown', onInputKeyDown)
+    }
 
     var init = function () {
+        initListeners()
+
         var sub = Service.getOrders()
 
         sub.done(function (response) {
-            var orders = response.orders.map(function(data){
-                return new Domain.Order(data)
-            })
-            Html.populateTable(orders)
-
-            var currentPage = response.currentPage
-            var pageCount = response.pageCount
-            Html.populatePagination(currentPage, pageCount)
+            populateOrdersFromResponse(response)
+            renderPaginationFromResponse(response)
         })
+
+
     }
 
     return {
         init: init
     }
 })()
-
 
 // Start app
 App.init()

@@ -49,7 +49,14 @@ public class OrderResource {
     }
 
     @GetMapping(value = "/orders/find")
-    public ResponseEntity<OrderListDto> findOrders(@RequestBody SearchBody body) {
+    public ResponseEntity<OrderListDto> findOrders(
+            @RequestParam(required = false) String id,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Long after,
+            @RequestParam(required = false) String createdBy
+    ) {
+        SearchBody body = SearchBody.from(id, status, after, createdBy);
+
         List<Order> orders = db.orders()
             .stream()
             .filter(it -> orderService.matches(body, it))
