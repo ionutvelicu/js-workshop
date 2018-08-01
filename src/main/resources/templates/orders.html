@@ -22,7 +22,7 @@
             </ul>
         </div>
         <div id="content">
-            <div class="content">
+            <div id="searchOrders" class="content">
                 <div class="row">
                     <div class="col">
                         <div class="card">
@@ -83,6 +83,41 @@
 
                             </ul>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="orderDetails" class="content">
+                <div style="padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #DDD; color: #FFF !important;">
+                    <a id="backToOrder" class="btn btn-primary">Back to orders</a>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <table class="table" style="margin-top: 2rem">
+                            <thead>
+                            <tr>
+                                <th scope="col">Key</th>
+                                <th scope="col">Value</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody id="orderInfo">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col">
+                        <table class="table" style="margin-top: 2rem">
+                            <thead>
+                            <tr>
+                                <th scope="col">Id</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Quantity</th>
+                                <th scope="col" class="total">Price</th>
+                            </tr>
+                            </thead>
+                            <tbody id="orderItems">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

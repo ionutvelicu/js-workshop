@@ -7,8 +7,21 @@
 // The module contains function constructors which can be called with the `new` keyword from other modules
 var Domain = (function (){
 
-    var OrderItem = function () {
+    var Item = function (data) {
+        this.id = data.productId;
+        this.price = data.price;
+        this.name = data.name;
+        this.quantity = data.quantity
+    }
 
+    var Member = function (data) {
+        this.id = data.id;
+        this.firstName = data.firstName || 'John';
+        this.lastName = data.lastName || 'Doe';
+    }
+
+    Member.prototype.fullName = function () {
+        return this.firstName + ' ' + this.lastName;
     }
 
     var Order = function (data) {
@@ -19,13 +32,16 @@ var Domain = (function (){
         this.total = data.total;
         this.currency = data.currency;
         this.status = data.status;
+        this.member = new Member(data.member || {});
+
+        data.items = data.items || []
+        this.items = data.items.map(function (item) { return new Item(item) })
     }
 
     return {
         Order: Order
     }
 })()
-
 
 // Html Module
 // In charge of altering / modifying the DOM
@@ -78,9 +94,54 @@ var Html = (function () {
         return html;
     }
 
+    var showOrderDetails = function () {
+        $('#searchOrders').hide()
+        $('#orderDetails').show()
+    }
+
+    var showSearchOrders = function () {
+        $('#searchOrders').show()
+        $('#orderDetails').hide()
+    }
+
+    var populateOrderDetails = function (order) {
+        populateOrderInfo(order)
+        populateOrderItems(order.items)
+    }
+
+    var populateOrderInfo = function (order) {
+        var html = '';
+        html += '<tr><td>ID</td><td>' + order.id + '</td></tr>';
+        html += '<tr><td>Author</td><td>' + order.member.fullName() + '</td></tr>';
+        html += '<tr><td>Status</td><td>' + order.status + '</td></tr>';
+        html += '<tr><td>Website</td><td>' + order.website + '</td></tr>';
+        html += '<tr><td class="subtotal">Subtotal</td><td class="subtotal">' + order.subTotal + '</td></tr>';
+        html += '<tr><td class="total">Total</td><td class="total">' + order.total + '</td></tr>';
+        $('#orderInfo').html(html);
+    }
+
+    var populateOrderItems = function (items) {
+        var html = items.map(function (item) {
+            var snippet = '';
+
+            snippet += '<tr>';
+            snippet += '<td>' + item.id + '</td>';
+            snippet += '<td>' + item.name + '</td>';
+            snippet += '<td>' + item.quantity + '</td>';
+            snippet += '<td class="total">' + item.price + '</td>';
+            snippet += '</tr>';
+
+            return snippet;
+        }).join()
+        $('#orderItems').html(html)
+    }
+
     return {
-        populateTable: populateTable,
-        populatePagination: populatePagination
+        populateTable:          populateTable,
+        populatePagination:     populatePagination,
+        showOrderDetails:       showOrderDetails,
+        showSearchOrders:       showSearchOrders,
+        populateOrderDetails:   populateOrderDetails
     }
 })()
 
@@ -154,39 +215,49 @@ var App = (function () {
         var page = $element.attr('data-page')
 
         Service.getOrders(page).done(function (response) {
-            populateOrdersFromResponse(response)
-            renderPaginationFromResponse(response)
+            populateOrdersFromResponse(response);
+            renderPaginationFromResponse(response);
         })
     }
 
     var onViewOrderClick = function (ev) {
-        console.log('=> view order details')
+        Html.showOrderDetails();
+
+        var id = $(this).attr('data-id');
+        Service.getOrderDetails(id).done(function (response) {
+            var order = new Domain.Order(response)
+            Html.populateOrderDetails(order)
+        })
+    }
+
+    var onBackToOrderClick = function () {
+        Html.showSearchOrders()
     }
 
     var onInputKeyDown = function (ev) {
         if (ev.target === document.body && ev.which === 9) {
-            ev.preventDefault()
-            currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1
+            ev.preventDefault();
+            currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1;
             Service.getOrders(currentPage).done(function (response) {
-                populateOrdersFromResponse(response)
-                renderPaginationFromResponse(response)
+                populateOrdersFromResponse(response);
+                renderPaginationFromResponse(response);
             })
         }
     }
 
     var onWindowKeyUp = function (ev) {
-        var code = ev.keyCode
-        if (ev.target !== document.body && (code === 37 || code === 39)) return
+        var code = ev.keyCode;
+        if (ev.target !== document.body && (code === 37 || code === 39)) return;
 
         if (code === 37 || code === 39) {
             if (code === 37) {
-                currentPage = (currentPage <= 1) ? 1 : currentPage -1
+                currentPage = (currentPage <= 1) ? 1 : currentPage -1;
             } else if (code === 39) {
-                currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1
+                currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1;
             }
             Service.getOrders(currentPage).done(function (response) {
-                populateOrdersFromResponse(response)
-                renderPaginationFromResponse(response)
+                populateOrdersFromResponse(response);
+                renderPaginationFromResponse(response);
             })
         }
     }
@@ -209,6 +280,7 @@ var App = (function () {
         $('#pagination').on('click', '.page-link', onPageLinkClick)
         $('.search-field').on('change', onChangeSearchField)
         $('#orderList').on('click', '.view-order', onViewOrderClick)
+        $('#backToOrder').on('click', onBackToOrderClick)
 
         $(window).on('keyup', onWindowKeyUp)
         $(window).on('keydown', onInputKeyDown)
