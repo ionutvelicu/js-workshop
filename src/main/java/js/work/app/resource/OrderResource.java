@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,9 @@ import java.util.stream.Collectors;
  *  GET /api/orders                 getOrders
  *  GET /api/orders/find            findOrders
  *  GET /api/orders/{id}            getOrderDetails
+ *  PUT /api/orders/{id}            updateOrder
+ *
+ *  GET /statuses                   getStatuses
  */
 
 @RestController
@@ -73,7 +77,7 @@ public class OrderResource {
     @GetMapping(value = "/orders/{id}")
     public ResponseEntity<OrderDetailsDto> getOrderDetails(
             @PathVariable String id
-        ) {
+    ) {
         List<Order> orders = db.orders()
                 .stream()
                 .filter(it -> it.id.equals(id))
@@ -81,5 +85,28 @@ public class OrderResource {
 
         if (orders.size() == 0) throw NotFoundException.get("Order not found");
         return ResponseEntity.ok(OrderDetailsDto.from(orders.get(0)));
+    }
+
+    @PutMapping(value = "/orders/{id}")
+    public ResponseEntity<Boolean> getOrderDetails(
+            @PathVariable String id,
+            @RequestBody OrderDto dto
+    ) {
+        List<Order> orders = db.orders()
+                .stream()
+                .filter(it -> it.id.equals(id))
+                .collect(Collectors.toList());
+
+        if (orders.size() == 0) throw NotFoundException.get("Order not found");
+
+        Order order = orders.get(0);
+        order.status = dto.status;
+
+        return ResponseEntity.ok(true);
+    }
+
+    @GetMapping(value = "/statuses")
+    public ResponseEntity<List<String>> getStatuses() {
+        return ResponseEntity.ok(Arrays.asList("created", "processing", "pending", "approved", "completed", "rejected", "cancelled"));
     }
 }
