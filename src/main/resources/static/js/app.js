@@ -42,13 +42,15 @@ var App = (function () {
         Html.showOrderDetails();
 
         var id = $(this).attr('data-id');
+        Store.activeOrderId = id
         Service.getOrderDetails(id).done(function (response) {
-            var order = new Domain.Order(response)
-            Html.populateOrderDetails(order)
+            var order = new Domain.Order(response);
+            Html.populateOrderDetails(order);
         })
     }
 
     var onBackToOrderClick = function () {
+        initOrders()
         Html.showSearchOrders()
     }
 
@@ -91,7 +93,40 @@ var App = (function () {
             populateOrdersFromResponse(response)
             renderPaginationFromResponse(response)
         })
+    }
 
+    var onShowStatusEditBlockClick = function () {
+        $('#statusLabelBlock').hide()
+        $('#statusEditBlock').show()
+    }
+
+    var onSaveNewStatusClick = function () {
+        var status = $('#statusField').val()
+        Service.updateOrderStatus(Store.activeOrderId, status).done(function () {
+            Service.getOrderDetails(Store.activeOrderId).done(function (response) {
+                var order = new Domain.Order(response);
+                Html.populateOrderInfo(order);
+            })
+        })
+
+        $('#statusLabelBlock').show()
+        $('#statusEditBlock').hide()
+    }
+
+    var onStatusFieldKeyup = function (ev) {
+        var val = ev.target.value
+        var suggestions = []
+        if (val.length > 0) {
+            suggestions = Store.statuses.filter(function (status) {
+                return status.indexOf(val) > -1
+            })
+        }
+        Html.populateStatusSuggestionList(suggestions)
+    }
+
+    var onStatusSuggestionClick = function () {
+        var status = $(this).attr('data-text')
+        $('#statusField').val(status)
     }
 
     var initListeners = function () {
@@ -100,18 +135,32 @@ var App = (function () {
         $('#orderList').on('click', '.view-order', onViewOrderClick)
         $('#backToOrder').on('click', onBackToOrderClick)
 
+        $('#orderInfo').on('click', '#showStatusEditBlock', onShowStatusEditBlockClick)
+        $('#orderInfo').on('click', '#saveNewStatus', onSaveNewStatusClick)
+        $('#orderInfo').on('keyup', '#statusField', onStatusFieldKeyup)
+        $('#orderInfo').on('click', '.status-suggestion', onStatusSuggestionClick)
+
+        $('body').on('click', function () {
+            $('.dropdown-menu').removeClass('show')
+        })
+
         $(window).on('keyup', onWindowKeyUp)
         $(window).on('keydown', onInputKeyDown)
     }
 
-    var init = function () {
-        initListeners()
-
-        var sub = Service.getOrders()
-
-        sub.done(function (response) {
+    var initOrders = function () {
+        Service.getOrders().done(function (response) {
             populateOrdersFromResponse(response)
             renderPaginationFromResponse(response)
+        })
+    }
+
+    var init = function () {
+        initListeners()
+        initOrders()
+
+        Service.getStatuses().done(function (response) {
+            Store.statuses = response
         })
     }
 

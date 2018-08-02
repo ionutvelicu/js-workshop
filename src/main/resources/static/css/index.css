@@ -62,3 +62,11 @@ header.main {
 .subtotal {
     color: #abbb14 !important;;
 }
+
+#showStatusEditBlock {
+    float: right;
+    cursor: pointer;
+    font-size: .9em;
+    color: #007aff;
+    line-height: 1.7em;
+}

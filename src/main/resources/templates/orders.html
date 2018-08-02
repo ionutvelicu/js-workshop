@@ -128,7 +128,7 @@
     </div>
 
 
-    <script id="order-row" type="text/x-handlebars-template">
+    <script id="orderRowTemplate" type="text/x-handlebars-template">
         <tr>
             <td>{{id}}</td>
             <td><span class="badge badge-pill badge-primary">{{status}}</span></td>
@@ -140,7 +140,7 @@
         </tr>
     </script>
 
-    <script id="order-info" type="text/x-handlebars-template">
+    <script id="orderInfoTemplate" type="text/x-handlebars-template">
         <tr>
             <td>ID</td>
             <td>{{order.id}}</td>
@@ -151,7 +151,20 @@
         </tr>
         <tr>
             <td>Status</td>
-            <td>{{order.status}}</td>
+            <td>
+                <div id="statusLabelBlock">
+                    {{order.status}}
+                    <a id="showStatusEditBlock">Edit</a>
+                </div>
+
+                <div id="statusEditBlock" style="display: none">
+                    <div style="display: inline-block">
+                        <input id="statusField" type="text" class="form-control" style="width: 200px; display: inline-block;" />
+                        <div id="statusSuggestionWrap" style="position: relative;"></div>
+                    </div>
+                    <a id="saveNewStatus" class="btn btn-primary btn-sm" style="color: #FFF !important">Save</a>
+                </div>
+            </td>
         </tr>
         <tr>
             <td>Website</td>
@@ -166,8 +179,17 @@
             <td>{{order.total}}</td>
         </tr>
     </script>
-    
+
+    <script id="statusSuggestionTemplate" type="text/x-handlebars-template">
+        <div id="statusSuggestionDropdown" class="dropdown-menu show">
+            {{#each suggestions}}
+            <a class="dropdown-item status-suggestion" data-text="{{this}}">{{this}}</a>
+            {{/each}}
+        </div>
+    </script>
+
     <script src="/js/domain.js"></script>
+    <script src="/js/store.js"></script>
     <script src="/js/service.js"></script>
     <script src="/js/html.js"></script>
     <script src="/js/app.js"></script>

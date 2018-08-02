@@ -2,8 +2,9 @@
 // In charge of altering / modifying the DOM
 // In order to maintain separation of concerns in the app, any kind of DOM change should be defined only in this module
 var Html = (function () {
-    var orderRowTemplate = Handlebars.compile($('#order-row').html());
-    var orderInfoTemplate = Handlebars.compile($('#order-info').html());
+    var orderRowTemplate = Handlebars.compile($('#orderRowTemplate').html());
+    var orderInfoTemplate = Handlebars.compile($('#orderInfoTemplate').html());
+    var statusSuggestionTemplate = Handlebars.compile($('#statusSuggestionTemplate').html());
 
     var populatePagination = function (current, total) {
         current = current || 1;
@@ -76,11 +77,24 @@ var Html = (function () {
         $('#orderItems').html(html)
     }
 
+    var populateStatusSuggestionList = function (suggestions) {
+        if (!suggestions || suggestions.length === 0) {
+            $('#statusSuggestionWrap').hide()
+        } else {
+            var $wrap = $('#statusSuggestionWrap')
+            var html = statusSuggestionTemplate({ suggestions: suggestions})
+            $wrap.html(html)
+            $wrap.show()
+        }
+    }
+
     return {
-        populateTable:          populateTable,
-        populatePagination:     populatePagination,
-        showOrderDetails:       showOrderDetails,
-        showSearchOrders:       showSearchOrders,
-        populateOrderDetails:   populateOrderDetails
+        populateTable:                  populateTable,
+        populatePagination:             populatePagination,
+        showOrderDetails:               showOrderDetails,
+        showSearchOrders:               showSearchOrders,
+        populateOrderDetails:           populateOrderDetails,
+        populateOrderInfo:              populateOrderInfo,
+        populateStatusSuggestionList:   populateStatusSuggestionList
     }
 })()

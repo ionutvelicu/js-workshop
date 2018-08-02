@@ -3,6 +3,7 @@
 // This should be a thin layer that only abstracts away the Ajax logic and returns promises to be used by other modules
 var Service = (function () {
     var ORDERS_PATH = '/api/orders';
+    var STATUSES_PATH = '/api/statuses';
 
     var getOrders = function (page, batch) {
         page = page || 1;
@@ -24,10 +25,24 @@ var Service = (function () {
         return $.get(ORDERS_PATH + '/find', body);
     }
 
+    var getStatuses = function () {
+        return $.get(STATUSES_PATH);
+    }
+
+    var updateOrderStatus = function (id, status) {
+        return $.ajax({
+            type: 'PUT',
+            url: ORDERS_PATH + '/' + id,
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({ status: status }),
+        });
+    }
+
     return {
         getOrders: getOrders,
         getOrderDetails: getOrderDetails,
         updateOrderStatus: updateOrderStatus,
-        findOrders: findOrders
+        findOrders: findOrders,
+        getStatuses: getStatuses
     }
 })()
