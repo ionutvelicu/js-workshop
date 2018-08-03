@@ -1,0 +1,49 @@
+//https://next.json-generator.com/EJpQojU4S
+
+[
+  {
+    'repeat(50, 50)': {
+		id: '{{objectId()}}',
+		date: '{{date(new Date(2018, 0, 1), new Date()).getTime()}}',
+		website: '{{random("blue", "red", "green")}}',
+		subTotal: '{{floating(5, 25, 2)}}',
+		total: '{{floating(27, 40, 2)}}',
+		member: {
+          id: '{{objectId()}}',
+          firstName: '{{firstName()}}',
+          lastName: '{{surname()}}'
+        },
+		status: '{{random("created", "processing", "approved", "completed", "rejected", "cancelled")}}',
+		currency: 'EUR',
+		items: [
+          	{
+              	'repeat(1, 5)': {
+                    sequence: '{{index()}}',
+                    productId: '{{objectId()}}',
+                    isPromo: '{{bool()}}',
+                    quantity: '{{integer([1], [3])}}',
+                    price: '{{floating(1, 3, 2)}}',
+                    name: '{{random("Aspirin", "Paracetamol", "Nurofen", "Antinevralgicum", "Peritol", "Doxacin", "Rheumagil", "Vitamin D", "Biofax", "Drill")}}'
+                }
+			}
+        ],
+		adjustments: [{
+                type: 'shipping',
+                amount: '{{floating(0, 4, 2)}}'
+			}, {
+                type: 'sales-tax',
+                amount: '{{floating(0, 7, 2)}}'
+			}
+        ],
+
+		statuses: [
+          {
+            'repeat(1, 3)': {
+                status: '{{random("created", "processing", "approved", "completed", "rejected", "cancelled")}}',
+                orderDate: '{{date(new Date(2018, 0, 1), new Date()).getTime()}}'
+          }
+		}
+       ]
+	}
+  }
+]
