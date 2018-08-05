@@ -24,3 +24,6 @@
 /dist/
 /nbdist/
 /.nb-gradle/
+
+/node_modules/
+/src/main/resources/static/js/app.js
