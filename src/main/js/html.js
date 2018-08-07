@@ -2,7 +2,6 @@
 // In charge of altering / modifying the DOM
 // In order to maintain separation of concerns in the app, any kind of DOM change should be defined only in this module
 
-var orderRowTemplate = Handlebars.compile($('#orderRowTemplate').html());
 var orderInfoTemplate = Handlebars.compile($('#orderInfoTemplate').html());
 var statusSuggestionTemplate = Handlebars.compile($('#statusSuggestionTemplate').html());
 
@@ -88,6 +87,15 @@ var populateStatusSuggestionList = function (suggestions) {
     }
 }
 
+var appPaginationTemplate = `
+        <div id="pagination" style="margin-top: 2rem; display: flex">
+            <ul class="pagination" style="margin: 0 auto;">
+                <li class="page-item" :class="{ active: page === currentPage }" v-for="page in pageCount">
+                    <a class="page-link" @click="onPageClick(page)">{{page}}</a>
+                </li>
+            </ul>
+        </div>`
+
 export default {
     populateTable:                  populateTable,
     populatePagination:             populatePagination,
@@ -95,5 +103,6 @@ export default {
     showSearchOrders:               showSearchOrders,
     populateOrderDetails:           populateOrderDetails,
     populateOrderInfo:              populateOrderInfo,
-    populateStatusSuggestionList:   populateStatusSuggestionList
+    populateStatusSuggestionList,
+    appPaginationTemplate
 }

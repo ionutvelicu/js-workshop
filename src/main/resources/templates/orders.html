@@ -7,138 +7,128 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
     <script src="https://momentjs.com/downloads/moment.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/index.css" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
-
 </head>
 <body>
-    <header class="main">
-        <h1>Dashboard</h1>
-    </header>
+    <div id="app">
+        <header class="main">
+            <h1>Dashboard</h1>
+        </header>
 
-    <div class="wrap">
-        <div id="side">
-            <ul>
-                <li><a class="selected">Orders</a></li>
-            </ul>
-        </div>
-        <div id="content">
-            <div id="searchOrders" class="content">
-                <div class="row">
-                    <div class="col">
-                        <div class="card">
-                            <div class="card-body">
-                                <form id="search-form">
-                                    <h4>Search</h4>
-                                    <div class="row">
-                                        <div class="form-group col">
-                                            <label for="searchId">Id</label>
-                                            <input type="text" class="form-control search-field" id="searchId" data-name="id" placeholder="Id">
+        <div class="wrap">
+            <div id="side">
+                <ul>
+                    <li><a class="selected">Orders</a></li>
+                </ul>
+            </div>
+            <div id="content">
+                <div id="searchOrders" class="content">
+                    <div class="row">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <form id="search-form">
+                                        <h4>Search</h4>
+                                        <div class="row">
+                                            <div class="form-group col">
+                                                <label>Id</label>
+                                                <input type="text"
+                                                       class="form-control search-field"
+                                                       placeholder="Id"
+                                                       :value="searchByIdField"
+                                                       @change="updateSearchField"
+                                                >
+                                            </div>
+                                            <div class="form-group col">
+                                                <label for="searchStatus">Status</label>
+                                                <input type="text" class="form-control search-field" id="searchStatus" data-name="status" placeholder="Status">
+                                            </div>
+                                            <div class="form-group col">
+                                                <label for="searchAfter">Placed after</label>
+                                                <input type="text" class="form-control search-field" id="searchAfter" data-name="after" placeholder="Placed after">
+                                            </div>
+                                            <div class="form-group col">
+                                                <label for="createdBy">Created by</label>
+                                                <input type="text" class="form-control search-field" id="createdBy" data-name="createdBy" placeholder="Created by">
+                                            </div>
+                                            <div class="col">
+                                                <a style="color: #FFF; margin-top: 2rem;"class="btn btn-primary" @click="doSearch">Search</a>
+                                            </div>
                                         </div>
-                                        <div class="form-group col">
-                                            <label for="searchStatus">Status</label>
-                                            <input type="text" class="form-control search-field" id="searchStatus" data-name="status" placeholder="Status">
-                                        </div>
-                                        <div class="form-group col">
-                                            <label for="searchAfter">Placed after</label>
-                                            <input type="text" class="form-control search-field" id="searchAfter" data-name="after" placeholder="Placed after">
-                                        </div>
-                                        <div class="form-group col">
-                                            <label for="createdBy">Created by</label>
-                                            <input type="text" class="form-control search-field" id="createdBy" data-name="createdBy" placeholder="Created by">
-                                        </div>
-                                        <div class="col">
-                                            <a style="color: #FFF; margin-top: 2rem;"class="btn btn-primary">Search</a>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
 
-                        <table class="table" style="margin-top: 2rem">
-                            <thead>
+                            <table class="table" style="margin-top: 2rem">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#ID</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Created</th>
+                                        <th scope="col">Website</th>
+                                        <th scope="col" class="subtotal">Subtotal</th>
+                                        <th scope="col" class="total">Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="order in orders">
+                                        <td>{{order.id}}</td>
+                                        <td><span class="badge badge-pill badge-primary">{{order.status}}</span></td>
+                                        <td>{{order.date}}</td>
+                                        <td>{{order.website}}</td>
+                                        <td class="subtotal"> &euro; {{order.subTotal}}</td>
+                                        <td class="total"> &euro;{{order.total}}</td>
+                                        <td><a class="btn btn-success btn-sm view-order">View</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <app-pagination :page-count="pageCount" :current-page="currentPage" v-on:changed="onPageClick"></app-pagination>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="orderDetails" class="content" style="display: none">
+                    <div style="padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #DDD; color: #FFF !important;">
+                        <a id="backToOrder" class="btn btn-primary">Back to orders</a>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <table class="table" style="margin-top: 2rem">
+                                <thead>
                                 <tr>
-                                    <th scope="col">#ID</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Created</th>
-                                    <th scope="col">Website</th>
-                                    <th scope="col" class="subtotal">Subtotal</th>
-                                    <th scope="col" class="total">Total</th>
+                                    <th scope="col">Key</th>
+                                    <th scope="col">Value</th>
                                     <th></th>
                                 </tr>
-                            </thead>
-                            <tbody id="orderList">
-                            </tbody>
-                        </table>
-
-
-                        <div id="pagination" style="margin-top: 2rem; display: flex">
-                            <ul class="pagination" style="margin: 0 auto;">
-                                <li>
-                                    <ul>
-
-                                    </ul>
-                                </li>
-                            </ul>
-                            <ul>
-
-                            </ul>
+                                </thead>
+                                <tbody id="orderInfo">
+                                </tbody>
+                            </table>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="orderDetails" class="content" style="display: none">
-                <div style="padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #DDD; color: #FFF !important;">
-                    <a id="backToOrder" class="btn btn-primary">Back to orders</a>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <table class="table" style="margin-top: 2rem">
-                            <thead>
-                            <tr>
-                                <th scope="col">Key</th>
-                                <th scope="col">Value</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody id="orderInfo">
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col">
-                        <table class="table" style="margin-top: 2rem">
-                            <thead>
-                            <tr>
-                                <th scope="col">Id</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Quantity</th>
-                                <th scope="col" class="total">Price</th>
-                            </tr>
-                            </thead>
-                            <tbody id="orderItems">
-                            </tbody>
-                        </table>
+                        <div class="col">
+                            <table class="table" style="margin-top: 2rem">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Id</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Quantity</th>
+                                    <th scope="col" class="total">Price</th>
+                                </tr>
+                                </thead>
+                                <tbody id="orderItems">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-
-    <script id="orderRowTemplate" type="text/x-handlebars-template">
-        <tr>
-            <td>{{id}}</td>
-            <td><span class="badge badge-pill badge-primary">{{status}}</span></td>
-            <td>{{date}}</td>
-            <td>{{website}}</td>
-            <td class="subtotal"> &euro; {{subTotal}}</td>
-            <td class="total"> &euro;{{total}}</td>
-            <td><a class="btn btn-success btn-sm view-order" data-id="{{id}}">View</a></td>
-        </tr>
-    </script>
 
     <script id="orderInfoTemplate" type="text/x-handlebars-template">
         <tr>

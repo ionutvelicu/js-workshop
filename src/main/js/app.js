@@ -1,6 +1,8 @@
 // App Module
 // It makes use of all the other modules to handles the app flows and functionality
 
+// https://facebook.github.io/flux/docs/overview.html
+
 import 'regenerator-runtime/runtime'
 
 import Service from './service'
@@ -157,10 +159,61 @@ const initOrders = () => {
 }
 
 const init = () => {
-    initListeners()
-    initOrders()
+    // initListeners()
+    // initOrders()
+    //
+    // Service.getStatuses().done(response => Store.statuses = response)
 
-    Service.getStatuses().done(response => Store.statuses = response)
+    Vue.component('app-pagination', {
+        template: Html.appPaginationTemplate,
+
+        props: ['pageCount', 'currentPage'],
+
+        methods: {
+            onPageClick (page) {
+                this.$emit('changed', page)
+            }
+        }
+    })
+
+    const app = new Vue({
+        el: '#app',
+
+        data: {
+            orders: [],
+            pageCount: 1,
+            currentPage: 1,
+
+            searchByIdField: ''
+        },
+
+        created () {
+            this.populateOrdersForPage(1)
+
+        },
+
+        methods: {
+            populateOrdersForPage (page) {
+                Service.getOrders(page).done((response) => {
+                    this.orders = response.orders.map(data => new Domain.Order(data))
+                    this.pageCount = response.pageCount
+                    this.currentPage = response.currentPage
+                })
+            },
+
+            onPageClick (page) {
+                this.populateOrdersForPage(page)
+                this.searchByIdField = ''
+            },
+
+            updateSearchField (ev) {
+                this.searchByIdField = ev.target.value
+            },
+
+            doSearch () {
+            }
+        }
+    })
 }
 
 // Start app
