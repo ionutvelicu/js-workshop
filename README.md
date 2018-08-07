@@ -3,3 +3,5 @@
 [See day2 documentation](https://github.com/ionutvelicu/js-workshop/tree/master/docs/day2.md)
 
 [See day4 documentation](https://github.com/ionutvelicu/js-workshop/tree/master/docs/day4.md)
+
+[See day6 documentation](https://github.com/ionutvelicu/js-workshop/tree/master/docs/day6.md)
