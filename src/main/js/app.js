@@ -1,8 +1,6 @@
 // App Module
 // It makes use of all the other modules to handles the app flows and functionality
 
-// https://facebook.github.io/flux/docs/overview.html
-
 import 'regenerator-runtime/runtime'
 
 import Service from './service'
