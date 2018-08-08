@@ -88,7 +88,7 @@ public class OrderResource {
     }
 
     @PutMapping(value = "/orders/{id}")
-    public ResponseEntity<Boolean> getOrderDetails(
+    public ResponseEntity<Boolean> updateOrder(
             @PathVariable String id,
             @RequestBody OrderDto dto
     ) {

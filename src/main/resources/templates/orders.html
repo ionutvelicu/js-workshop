@@ -26,7 +26,7 @@
                 </ul>
             </div>
             <div id="content">
-                <div id="searchOrders" class="content">
+                <div class="content" v-if="view === 'orders'">
                     <div class="row">
                         <div class="col">
                             <div class="card">
@@ -38,10 +38,7 @@
                                                 <label>Id</label>
                                                 <input type="text"
                                                        class="form-control search-field"
-                                                       placeholder="Id"
-                                                       :value="searchByIdField"
-                                                       @change="updateSearchField"
-                                                >
+                                                       placeholder="Id">
                                             </div>
                                             <div class="form-group col">
                                                 <label for="searchStatus">Status</label>
@@ -56,7 +53,7 @@
                                                 <input type="text" class="form-control search-field" id="createdBy" data-name="createdBy" placeholder="Created by">
                                             </div>
                                             <div class="col">
-                                                <a style="color: #FFF; margin-top: 2rem;"class="btn btn-primary" @click="doSearch">Search</a>
+                                                <a style="color: #FFF; margin-top: 2rem;"class="btn btn-primary">Search</a>
                                             </div>
                                         </div>
                                     </form>
@@ -83,7 +80,7 @@
                                         <td>{{order.website}}</td>
                                         <td class="subtotal"> &euro; {{order.subTotal}}</td>
                                         <td class="total"> &euro;{{order.total}}</td>
-                                        <td><a class="btn btn-success btn-sm view-order">View</a></td>
+                                        <td><a class="btn btn-success btn-sm" @click="viewOrderDetails(order.id)">View</a></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -92,11 +89,11 @@
                     </div>
                 </div>
 
-                <div id="orderDetails" class="content" style="display: none">
+                <div class="content" v-if="view === 'details'">
                     <div style="padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #DDD; color: #FFF !important;">
-                        <a id="backToOrder" class="btn btn-primary">Back to orders</a>
+                        <a id="backToOrder" class="btn btn-primary" @click="goToOrders">Back to orders</a>
                     </div>
-                    <div class="row">
+                    <div class="row" v-if="activeOrder">
                         <div class="col">
                             <table class="table" style="margin-top: 2rem">
                                 <thead>
@@ -106,7 +103,52 @@
                                     <th></th>
                                 </tr>
                                 </thead>
-                                <tbody id="orderInfo">
+                                <tbody>
+                                    <tr>
+                                        <td>ID</td>
+                                        <td>{{activeOrder.id}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Author</td>
+                                        <td>{{activeOrder.member.firstName}} {{activeOrder.member.lastName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Status</td>
+                                        <td>
+                                            <div v-show="!isChangeStatusToggled">
+                                                {{activeOrder.status}}
+                                                <a @click="toggleChangeStatus" style="float: right; color: #007bff;">Edit</a>
+                                            </div>
+
+                                            <div v-show="isChangeStatusToggled">
+                                                <div style="display: inline-block">
+                                                    <input
+                                                            @keyup="onStatusKeyup"
+                                                            :value="newStatus"
+                                                            type="text" class="form-control" style="width: 200px; display: inline-block;" />
+                                                    <div id="statusSuggestionWrap" style="position: relative;">
+                                                        <div class="dropdown-menu show" v-if="suggestions.length > 0">
+                                                            <a class="dropdown-item" v-for="suggestion in suggestions"
+                                                               @click="selectSuggestion(suggestion)">{{suggestion}}</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <a class="btn btn-primary btn-sm" style="color: #FFF !important" @click="saveNewStatus">Save</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Website</td>
+                                        <td>{{activeOrder.website}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Subtotal</td>
+                                        <td>{{activeOrder.subtotal}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total</td>
+                                        <td>{{activeOrder.total}}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -120,7 +162,13 @@
                                     <th scope="col" class="total">Price</th>
                                 </tr>
                                 </thead>
-                                <tbody id="orderItems">
+                                <tbody>
+                                    <tr v-for="item in activeOrder.items">
+                                        <td>{{ item.id }}</td>
+                                        <td>{{ item.name }}</td>
+                                        <td>{{ item.quantity }}</td>
+                                        <td class="total">{{ item.price }}</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -129,54 +177,6 @@
             </div>
         </div>
     </div>
-
-    <script id="orderInfoTemplate" type="text/x-handlebars-template">
-        <tr>
-            <td>ID</td>
-            <td>{{order.id}}</td>
-        </tr>
-        <tr>
-            <td>Author</td>
-            <td>{{order.member.firstName}} {{order.member.lastName}}</td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td>
-                <div id="statusLabelBlock">
-                    {{order.status}}
-                    <a id="showStatusEditBlock">Edit</a>
-                </div>
-
-                <div id="statusEditBlock" style="display: none">
-                    <div style="display: inline-block">
-                        <input id="statusField" type="text" class="form-control" style="width: 200px; display: inline-block;" />
-                        <div id="statusSuggestionWrap" style="position: relative;"></div>
-                    </div>
-                    <a id="saveNewStatus" class="btn btn-primary btn-sm" style="color: #FFF !important">Save</a>
-                </div>
-            </td>
-        </tr>
-        <tr>
-            <td>Website</td>
-            <td>{{order.website}}</td>
-        </tr>
-        <tr>
-            <td>Subtotal</td>
-            <td>{{order.subtotal}}</td>
-        </tr>
-        <tr>
-            <td>Total</td>
-            <td>{{order.total}}</td>
-        </tr>
-    </script>
-
-    <script id="statusSuggestionTemplate" type="text/x-handlebars-template">
-        <div id="statusSuggestionDropdown" class="dropdown-menu show">
-            {{#each suggestions}}
-            <a class="dropdown-item status-suggestion" data-text="{{this}}">{{this}}</a>
-            {{/each}}
-        </div>
-    </script>
 
     <script src="/js/app.js"></script>
 </body>

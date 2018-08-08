@@ -5,163 +5,10 @@ import 'regenerator-runtime/runtime'
 
 import Service from './service'
 import Domain from './domain'
-import Html from './html'
 import Store from './store'
+import Html from './html'
 
-let currentPage = 1
-let pageCount = 1
-
-const populateOrdersFromResponse = (response) => {
-    let orders = response.orders.map(data => new Domain.Order(data))
-    Html.populateTable(orders)
-}
-
-const renderPaginationFromResponse = (response) => {
-    currentPage = response.currentPage
-    pageCount = response.pageCount
-    Html.populatePagination(currentPage, pageCount)
-}
-
-const onPageLinkClick = function (ev) {
-    ev.stopPropagation()
-
-    // this = event.target
-    const $element = $(this)
-
-    // Set HTML style
-    // Commented out because of renderPaginationFromResponse function
-    // $('#pagination').find('.page-item.active').removeClass('active')
-    // $element.parent().addClass('active')
-
-    // Show page results
-    const page = $element.attr('data-page')
-
-    Service.getOrders(page).done((response) => {
-        populateOrdersFromResponse(response)
-        renderPaginationFromResponse(response)
-    })
-}
-
-const onViewOrderClick = async function (ev) {
-    Html.showOrderDetails();
-
-    const id = $(this).attr('data-id');
-    Store.activeOrderId = id
-
-    const response = await Service.getOrderDetails(id)
-    Html.populateOrderDetails(new Domain.Order(response))
-}
-
-const onBackToOrderClick = () => {
-    initOrders()
-    Html.showSearchOrders()
-}
-
-const onInputKeyDown = (ev) => {
-    if (ev.target === document.body && ev.which === 9) {
-        ev.preventDefault();
-        currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1;
-        Service.getOrders(currentPage).done(response => {
-            populateOrdersFromResponse(response);
-            renderPaginationFromResponse(response);
-        })
-    }
-}
-
-const onWindowKeyUp = (ev) => {
-    const code = ev.keyCode;
-    if (ev.target !== document.body && (code === 37 || code === 39)) return;
-
-    if (code === 37 || code === 39) {
-        if (code === 37) {
-            currentPage = (currentPage <= 1) ? 1 : currentPage -1;
-        } else if (code === 39) {
-            currentPage = (currentPage >= pageCount) ? pageCount : currentPage + 1;
-        }
-        Service.getOrders(currentPage).done(response => {
-            populateOrdersFromResponse(response);
-            renderPaginationFromResponse(response);
-        })
-    }
-}
-
-const onChangeSearchField = function (ev) {
-    const $this = $(this)
-    const type = $this.attr('data-name')
-
-    const body = {}
-    body[type] = $this.val()
-
-    Service.findOrders(body).done((response) => {
-        populateOrdersFromResponse(response)
-        renderPaginationFromResponse(response)
-    })
-}
-
-const onShowStatusEditBlockClick = () => {
-    $('#statusLabelBlock').hide()
-    $('#statusEditBlock').show()
-}
-
-const onSaveNewStatusClick = async () => {
-    const status = $('#statusField').val()
-
-    await Service.updateOrderStatus(Store.activeOrderId, status)
-    const response = await Service.getOrderDetails(Store.activeOrderId)
-
-    const order = new Domain.Order(response)
-    Html.populateOrderInfo(order)
-
-    $('#statusLabelBlock').show()
-    $('#statusEditBlock').hide()
-}
-
-const onStatusFieldKeyup = (ev) => {
-    const val = ev.target.value
-    let suggestions = []
-    if (val.length > 0) {
-        suggestions = Store.statuses.filter((status) => {
-            return status.indexOf(val) > -1
-        })
-    }
-    Html.populateStatusSuggestionList(suggestions)
-}
-
-const onStatusSuggestionClick = function () {
-    const status = $(this).attr('data-text')
-    $('#statusField').val(status)
-}
-
-const initListeners = () => {
-    $('#pagination').on('click', '.page-link', onPageLinkClick)
-    $('.search-field').on('change', onChangeSearchField)
-    $('#orderList').on('click', '.view-order', onViewOrderClick)
-    $('#backToOrder').on('click', onBackToOrderClick)
-
-    $('#orderInfo').on('click', '#showStatusEditBlock', onShowStatusEditBlockClick)
-    $('#orderInfo').on('click', '#saveNewStatus', onSaveNewStatusClick)
-    $('#orderInfo').on('keyup', '#statusField', onStatusFieldKeyup)
-    $('#orderInfo').on('click', '.status-suggestion', onStatusSuggestionClick)
-
-    $('body').on('click', () =>  $('.dropdown-menu').removeClass('show'))
-
-    $(window).on('keyup', onWindowKeyUp)
-    $(window).on('keydown', onInputKeyDown)
-}
-
-const initOrders = () => {
-    Service.getOrders().done(function (response) {
-        populateOrdersFromResponse(response)
-        renderPaginationFromResponse(response)
-    })
-}
-
-const init = () => {
-    // initListeners()
-    // initOrders()
-    //
-    // Service.getStatuses().done(response => Store.statuses = response)
-
+const initComponents = () => {
     Vue.component('app-pagination', {
         template: Html.appPaginationTemplate,
 
@@ -173,24 +20,50 @@ const init = () => {
             }
         }
     })
+}
 
-    const app = new Vue({
+const init = () => {
+    initComponents()
+
+    const App = new Vue({
         el: '#app',
 
         data: {
-            orders: [],
-            pageCount: 1,
-            currentPage: 1,
+            orders:                 [],
+            pageCount:              1,
+            currentPage:            1,
 
-            searchByIdField: ''
+            newStatus:              '',
+            suggestions:            [],
+            view:                   'orders',
+            activeOrder:            null,
+
+            isChangeStatusToggled:  false
         },
 
         created () {
             this.populateOrdersForPage(1)
-
+            this.initListeners()
+            this.handleRoute()
+            Service.getStatuses().done(response => Store.statuses = response)
         },
 
         methods: {
+            initListeners () {
+                window.onpopstate = history.onpushstate = () => {
+                    this.handleRoute()
+                }
+            },
+
+            handleRoute () {
+                const path = window.location.pathname
+                if (path === '/') {
+                    this.view = 'orders'
+                } else if (path.indexOf('/orders/') > -1) {
+                    this.viewOrderDetails(path.replace('/orders', ''))
+                }
+            },
+
             populateOrdersForPage (page) {
                 Service.getOrders(page).done((response) => {
                     this.orders = response.orders.map(data => new Domain.Order(data))
@@ -201,14 +74,50 @@ const init = () => {
 
             onPageClick (page) {
                 this.populateOrdersForPage(page)
-                this.searchByIdField = ''
             },
 
-            updateSearchField (ev) {
-                this.searchByIdField = ev.target.value
+            viewOrderDetails (orderId) {
+                this.view = 'details'
+                const path = window.location.pathname
+                if (path.indexOf(orderId) === -1) {
+                    window.history.pushState(null, '', `/orders/${orderId}`)
+                }
+
+                Service.getOrderDetails(orderId).done((response) => {
+                    this.activeOrder = new Domain.Order(response)
+                })
             },
 
-            doSearch () {
+            goToOrders () {
+                if (window.history.length > 1) {
+                    window.history.back()
+                } else {
+                    window.history.pushState(null, '', '/')
+                }
+
+            },
+
+            toggleChangeStatus () {
+                this.isChangeStatusToggled = !this.isChangeStatusToggled
+            },
+
+            saveNewStatus () {
+                Service.updateOrderStatus(this.activeOrder.id, this.newStatus)
+                this.activeOrder.status = this.newStatus
+                this.isChangeStatusToggled = !this.isChangeStatusToggled
+            },
+
+            onStatusKeyup (ev) {
+                const val = ev.target.value
+                this.suggestions = Store.statuses.filter((status) => {
+                    return status.indexOf(val) > -1
+                })
+                this.newStatus = val
+            },
+
+            selectSuggestion (suggestion) {
+                this.newStatus = suggestion
+                this.suggestions = []
             }
         }
     })

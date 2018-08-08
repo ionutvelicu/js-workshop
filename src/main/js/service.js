@@ -11,7 +11,7 @@ const getOrders = function (page, batch) {
     return $.get(ORDERS_PATH, { page: page, batch: batch});
 }
 
-const getOrderDetails = async function(id) {
+const getOrderDetails = function(id) {
     return $.get(ORDERS_PATH + '/' + id);
 }
 
@@ -23,7 +23,7 @@ const getStatuses = function () {
     return $.get(STATUSES_PATH);
 }
 
-const updateOrderStatus = async function (id, status) {
+const updateOrderStatus = function (id, status) {
     return $.ajax({
         type: 'PUT',
         url: ORDERS_PATH + '/' + id,
