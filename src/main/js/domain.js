@@ -1,14 +1,17 @@
 // Domain Module
 // In charge to define all available objects / domain models used in the application
 // The module contains function constructors which can be called with the `new` keyword from other modules
-var Item = function (data) {
+
+import moment from 'moment'
+
+const Item = function (data) {
     this.id = data.productId;
     this.price = data.price;
     this.name = data.name;
     this.quantity = data.quantity
 }
 
-var Member = function (data) {
+const Member = function (data) {
     this.id = data.id;
     this.firstName = data.firstName || 'John';
     this.lastName = data.lastName || 'Doe';
@@ -19,7 +22,7 @@ Member.prototype.fullName = function () {
     return this.firstName + ' ' + this.lastName;
 }
 
-var Order = function (data) {
+const Order = function (data) {
     this.id = data.id || 'id';
     this.date = moment(data.date).format('HH:mm, DD')
     this.website = data.website;

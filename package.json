@@ -21,9 +21,20 @@
   "homepage": "https://github.com/ionutvelicu/js-workshop#readme",
   "devDependencies": {
     "babel-core": "^6.26.3",
+    "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.5",
     "babel-preset-env": "^1.7.0",
+    "eslint": "^5.3.0",
+    "eslint-loader": "^2.1.0",
+    "eslint-plugin-vue": "^4.7.1",
+    "jquery": "^3.3.1",
+    "moment": "^2.22.2",
     "regenerator-runtime": "^0.12.1",
-    "webpack": "^4.16.4"
+    "vue": "^2.5.17",
+    "vue-loader": "^15.3.0",
+    "vue-router": "^3.0.1",
+    "vue-template-compiler": "^2.5.17",
+    "webpack": "^4.16.4",
+    "webpack-cli": "^3.1.0"
   }
 }

@@ -15,7 +15,7 @@ ES6 allows better code structuring via modules.
 2. Anything that is not exported will be private to that module;
 
 ```aidl
-/* service.js module */
+/* orderService.js module */
 
 const privateFunc = function () { ... }
 

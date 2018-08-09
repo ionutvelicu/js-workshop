@@ -1,0 +1,28 @@
+//https://gist.github.com/cletusw/e01a85e399ab563b1236
+
+{
+  "extends": "plugin:vue/recommended",
+
+  "parserOptions": {
+    "parser": "babel-eslint",
+    "ecmaVersion": 2017,
+    "sourceType": "module"
+  },
+
+  "rules": {
+    "vue/max-attributes-per-line":  "off",
+    "vue/html-indent":              "off",
+    "vue/attributes-order":         "off",
+
+    "indent":                       ["error", 4],
+
+    "no-irregular-whitespace":      "error",
+    "no-spaced-func":               "error",
+    "no-extra-semi":                "error",
+    "no-var":                       "error",
+    "no-alert":                     "error",
+    "keyword-spacing":              "error",
+    "space-before-function-paren":  ["error", "always"],
+    "quotes":                       ["error", "single", { "allowTemplateLiterals": true }]
+  }
+}

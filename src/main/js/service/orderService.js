@@ -2,6 +2,8 @@
 // In charge of making async calls to the server
 // This should be a thin layer that only abstracts away the Ajax logic and returns promises to be used by other modules
 
+import $ from 'jquery'
+
 const ORDERS_PATH = '/api/orders';
 const STATUSES_PATH = '/api/statuses';
 
@@ -11,7 +13,7 @@ const getOrders = function (page, batch) {
     return $.get(ORDERS_PATH, { page: page, batch: batch});
 }
 
-const getOrderDetails = function(id) {
+const getOrderDetails = function (id) {
     return $.get(ORDERS_PATH + '/' + id);
 }
 

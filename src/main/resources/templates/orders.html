@@ -3,21 +3,13 @@
 <head>
     <title>Orders</title>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
-    <script src="https://momentjs.com/downloads/moment.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.17/dist/vue.js"></script>
-
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/index.css" />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
 </head>
 <body>
     <div id="app">
-        <header class="main">
-            <h1>Dashboard</h1>
-        </header>
+        <app-header></app-header>
 
         <div class="wrap">
             <div id="side">
@@ -26,154 +18,7 @@
                 </ul>
             </div>
             <div id="content">
-                <div class="content" v-if="view === 'orders'">
-                    <div class="row">
-                        <div class="col">
-                            <div class="card">
-                                <div class="card-body">
-                                    <form id="search-form">
-                                        <h4>Search</h4>
-                                        <div class="row">
-                                            <div class="form-group col">
-                                                <label>Id</label>
-                                                <input type="text"
-                                                       class="form-control search-field"
-                                                       placeholder="Id">
-                                            </div>
-                                            <div class="form-group col">
-                                                <label for="searchStatus">Status</label>
-                                                <input type="text" class="form-control search-field" id="searchStatus" data-name="status" placeholder="Status">
-                                            </div>
-                                            <div class="form-group col">
-                                                <label for="searchAfter">Placed after</label>
-                                                <input type="text" class="form-control search-field" id="searchAfter" data-name="after" placeholder="Placed after">
-                                            </div>
-                                            <div class="form-group col">
-                                                <label for="createdBy">Created by</label>
-                                                <input type="text" class="form-control search-field" id="createdBy" data-name="createdBy" placeholder="Created by">
-                                            </div>
-                                            <div class="col">
-                                                <a style="color: #FFF; margin-top: 2rem;"class="btn btn-primary">Search</a>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-
-                            <table class="table" style="margin-top: 2rem">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#ID</th>
-                                        <th scope="col">Status</th>
-                                        <th scope="col">Created</th>
-                                        <th scope="col">Website</th>
-                                        <th scope="col" class="subtotal">Subtotal</th>
-                                        <th scope="col" class="total">Total</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="order in orders">
-                                        <td>{{order.id}}</td>
-                                        <td><span class="badge badge-pill badge-primary">{{order.status}}</span></td>
-                                        <td>{{order.date}}</td>
-                                        <td>{{order.website}}</td>
-                                        <td class="subtotal"> &euro; {{order.subTotal}}</td>
-                                        <td class="total"> &euro;{{order.total}}</td>
-                                        <td><a class="btn btn-success btn-sm" @click="viewOrderDetails(order.id)">View</a></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <app-pagination :page-count="pageCount" :current-page="currentPage" v-on:changed="onPageClick"></app-pagination>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="content" v-if="view === 'details'">
-                    <div style="padding-bottom: 1rem; margin-bottom: 1rem; border-bottom: 1px solid #DDD; color: #FFF !important;">
-                        <a id="backToOrder" class="btn btn-primary" @click="goToOrders">Back to orders</a>
-                    </div>
-                    <div class="row" v-if="activeOrder">
-                        <div class="col">
-                            <table class="table" style="margin-top: 2rem">
-                                <thead>
-                                <tr>
-                                    <th scope="col">Key</th>
-                                    <th scope="col">Value</th>
-                                    <th></th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>ID</td>
-                                        <td>{{activeOrder.id}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Author</td>
-                                        <td>{{activeOrder.member.firstName}} {{activeOrder.member.lastName}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Status</td>
-                                        <td>
-                                            <div v-show="!isChangeStatusToggled">
-                                                {{activeOrder.status}}
-                                                <a @click="toggleChangeStatus" style="float: right; color: #007bff;">Edit</a>
-                                            </div>
-
-                                            <div v-show="isChangeStatusToggled">
-                                                <div style="display: inline-block">
-                                                    <input
-                                                            @keyup="onStatusKeyup"
-                                                            :value="newStatus"
-                                                            type="text" class="form-control" style="width: 200px; display: inline-block;" />
-                                                    <div id="statusSuggestionWrap" style="position: relative;">
-                                                        <div class="dropdown-menu show" v-if="suggestions.length > 0">
-                                                            <a class="dropdown-item" v-for="suggestion in suggestions"
-                                                               @click="selectSuggestion(suggestion)">{{suggestion}}</a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <a class="btn btn-primary btn-sm" style="color: #FFF !important" @click="saveNewStatus">Save</a>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>Website</td>
-                                        <td>{{activeOrder.website}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Subtotal</td>
-                                        <td>{{activeOrder.subtotal}}</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Total</td>
-                                        <td>{{activeOrder.total}}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col">
-                            <table class="table" style="margin-top: 2rem">
-                                <thead>
-                                <tr>
-                                    <th scope="col">Id</th>
-                                    <th scope="col">Name</th>
-                                    <th scope="col">Quantity</th>
-                                    <th scope="col" class="total">Price</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="item in activeOrder.items">
-                                        <td>{{ item.id }}</td>
-                                        <td>{{ item.name }}</td>
-                                        <td>{{ item.quantity }}</td>
-                                        <td class="total">{{ item.price }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <router-view></router-view>
             </div>
         </div>
     </div>
