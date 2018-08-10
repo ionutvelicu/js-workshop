@@ -7,7 +7,7 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class MainController {
 
-    @GetMapping(value = "/")
+    @GetMapping(value = {"/", "/orders/**"})
     public ModelAndView orders() {
         return new ModelAndView("orders");
     }

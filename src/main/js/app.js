@@ -182,12 +182,18 @@ const init = () => {
             pageCount: 1,
             currentPage: 1,
 
-            searchByIdField: ''
+            searchByIdField: '',
+            viewMode: 'orderList',
+            orderDetails:null,
+            editStatusActive:false,
+            statuses:[],
+            displayStatuses:false
         },
 
         created () {
-            this.populateOrdersForPage(1)
-
+            this.populateOrdersForPage(1);
+            Service.getStatuses().done(response => Store.statuses = response);
+            this.initWindowStuff();
         },
 
         methods: {
@@ -207,12 +213,62 @@ const init = () => {
             updateSearchField (ev) {
                 this.searchByIdField = ev.target.value
             },
-
+ 
             doSearch () {
+            },
+            
+            viewOrderDetails(orderId) {
+            	this.viewMode = 'orderDetails';
+            	
+            	Service.getOrderDetails(orderId).done( (response) => {
+            		this.orderDetails = new Domain.Order(response);
+            	});
+            	
+            	window.history.pushState(null, "Order Details", "/orders/"+orderId);
+            },
+            
+            viewOrderList() {
+            	Service.getOrders(this.currentPage).done((response) => {
+                    this.orders = response.orders.map(data => new Domain.Order(data))
+                    this.pageCount = response.pageCount
+                    this.currentPage = response.currentPage
+                });
+            	this.viewMode = 'orderList';
+            },
+            
+            editStatus(orderId) {
+            	this.editStatusActive = true;
+            },
+            
+            saveStatus(orderId) {
+            	this.editStatusActive = false;
+            	Service.updateOrderStatus(orderId, this.orderDetails.status);
+            },
+            
+            statusSelected(status) {
+            	this.orderDetails.status = status;
+            	this.displayStatuses = false;
+            },
+            
+            statusKeyUp(ev) {
+            	this.statuses = Store.statuses.filter((status) => {
+                    return status.indexOf(ev.target.value) > -1
+                })
+                this.displayStatuses = true;
+            },
+            
+            initWindowStuff() {
+            	$(window).bind('popstate', function() {
+            		if (window.location.href==='http://localhost:8080/'){
+            			this.viewMode = 'orderList';
+            		}
+            	});
             }
         }
     })
 }
-
+console.log(77777);
 // Start app
 init()
+
+

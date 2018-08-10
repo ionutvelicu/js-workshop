@@ -2,8 +2,8 @@
 // In charge of altering / modifying the DOM
 // In order to maintain separation of concerns in the app, any kind of DOM change should be defined only in this module
 
-var orderInfoTemplate = Handlebars.compile($('#orderInfoTemplate').html());
-var statusSuggestionTemplate = Handlebars.compile($('#statusSuggestionTemplate').html());
+//var orderInfoTemplate = Handlebars.compile($('#orderInfoTemplate').html());
+//var statusSuggestionTemplate = Handlebars.compile($('#statusSuggestionTemplate').html());
 
 var populatePagination = function (current, total) {
     current = current || 1;
